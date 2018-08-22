@@ -60,7 +60,12 @@ if (isset($_REQUEST['submit1'])) {
               <div class="row justify-content-center">
                   <div class="col-md-6 col-md-offset-3" align="center">
                   <form id="f1">
-                    <table>
+                    <table><tr><td><?php
+                            if(isset($_REQUEST['err']))
+                            {
+                             	echo "<font color='red'>* You have to select Atleast one checkbox</font>";
+                            }
+                        ?></td></tr>
                     <?php
                     $totalalbum = count($_SESSION['userData']['albums']);
                     for ($i=0; $i<$totalalbum; $i++) { ?>
