@@ -3,6 +3,17 @@ require_once "lib/Google/config.php";
 
 if (isset($_REQUEST['val'])) {
     if (isset($_SESSION['gdaccess_token'])) {
+        if($_REQUEST['val'] == 'single' || $_REQUEST['val'] == 'multiple')
+        {
+            if(!isset($_REQUEST['q']))
+            {
+                header('Location: multiple.php?err=d/u');
+            }
+            if($_REQUEST['q'] == "")
+            {
+                header('Location: multiple.php?err=d/u');
+	        }
+        }
         $Client->setAccessToken($_SESSION['gdaccess_token']);
         $service = new Google_Service_Drive($Client);
 
