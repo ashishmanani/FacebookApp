@@ -10,7 +10,7 @@ password: password@123
 
 Full Description
 
-First of all the user open your site and it can see first page that is login page of this website then it press the login with Facebook Button after that user provide the email id and password of facebook in this case user must enter email id and password that gave to you in redme.md file.
+First of all the user open your site and it can see first page that is login page of this website then it press the login with Facebook Button after that To login in Facebook, you must use Facebook ID & Password Maintain below.
 
 After that user can see the index page of this site on this page. the server can get all album with images and show to user in index file.
 
