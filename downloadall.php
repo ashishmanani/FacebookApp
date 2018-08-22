@@ -89,6 +89,9 @@ if (isset($_REQUEST['val'])) {
             downloadzip("zip/".$_SESSION['userData']['id'].".zip");
             break;
         case 'single':
+            if($_REQUEST['q'] == ""){
+		        header('Location: multiple.php?err=d/u');
+	        }
             if (!file_exists("images/".$_SESSION['userData']['id'])) {
                 mkdir("images/".$_SESSION['userData']['id']);
             } else {
@@ -110,6 +113,9 @@ if (isset($_REQUEST['val'])) {
             downloadzip("zip/".$_SESSION['userData']['id'].".zip");
             break;
         case 'multiple':
+            if($_REQUEST['q'] == ""){
+		        header('Location: multiple.php?err=d/u');
+	        }
             if (!file_exists("images/".$_SESSION['userData']['id'])) {
                 mkdir("images/".$_SESSION['userData']['id']);
             } else {
