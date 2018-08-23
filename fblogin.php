@@ -7,7 +7,7 @@ if (isset($_SESSION['fbaccess_token'])) {
 }
 
 $redirectURL = "http://localhost/FacebookApp/fbcallback.php";
-$permissions = ['email'];
+$permissions = ['email','public_profile','user_photos'];
 $loginURL = $helper->getLoginUrl($redirectURL, $permissions);
 ?>
 <!doctype html>
