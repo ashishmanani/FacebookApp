@@ -11,10 +11,11 @@ if (isset($_REQUEST['submit1'])) {
 }
 
 if (isset($_SESSION['url'])) {
-    $data = $_SESSION['url'];
-    unset($_SESSION['url']);
-    header('Location: '.$data);
+	$data = $_SESSION['url'];
+	unset($_SESSION['url']);
+        header('Location: '.$data);
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -76,15 +77,17 @@ if (isset($_SESSION['url'])) {
             if (isset($_SESSION['userData']['albums'])) {
                 $totalalbum = count($_SESSION['userData']['albums']);
                 for ($i=0; $i<$totalalbum; $i++) {
-                    $count = count($_SESSION['userData']['albums'][$i]['photos']);?>
+		    $albumid = $_SESSION['userData']['albums'][$i]['id'];
+                    $count = $_SESSION['userData']['albums'][$i]['count'];?>
                     <div class="slider" id="<?php echo $_SESSION['userData']['albums'][$i]['id'];?>">
                       <div class="wrap" style="background:black;">
 <div id="arrow-left<?php echo $_SESSION['userData']['albums'][$i]['id'];?>" class="arrow-left"></div>
                     <?php
                     for ($j=0; $j<$count; $j++) {?>
 <div id="s<?php echo $_SESSION['userData']['albums'][$i]['id'];?>" class="slide">
-                      <img src="<?php echo $_SESSION['userData']['albums'][$i]['photos'][$j]['images'][0]['source'];?>"
+                      <img src="<?php echo $_SESSION['userData'][$albumid][$j];?>"
                       width="50%"/>
+			<?php $tmp = $j+1; echo "<br>".$tmp;?>
                     </div>
                         <?php
                     }
@@ -96,7 +99,7 @@ if (isset($_SESSION['url'])) {
                 </div>
               </div>
                 <div class="col-md-3 thumbnail">
-                  <img src="<?php echo $_SESSION['userData']['albums'][$i]['photos'][0]['images'][0]['source']; ?>"
+                  <img src="<?php echo $_SESSION['userData'][$albumid][0]; ?>"
                   onclick="fun(<?php echo $_SESSION['userData']['albums'][$i]['id'];?>);" class='img-responsive image'
                   style='height:300px; border-style:solid; border-width:2px;'>
                   <div style="display:none;" class="progress centered"
@@ -106,7 +109,10 @@ if (isset($_SESSION['url'])) {
                       <p style="color: yellow; font-size:15px;">It will take while!! So, You have to Wait. :)</p>
                     </div>
                   </div>
+                  <div style="height:60px;">
                   <h3><?php echo $_SESSION['userData']['albums'][$i]['name']?></h3>
+				  <?php echo "Total Image ".$count;?>
+                  </div>
               <div>
                 <a onclick="singleProgress(<?php echo $_SESSION['userData']['albums'][$i]['id'];?>);"
                   href="uploadall.php?val=single&q=<?php echo $_SESSION['userData']['albums'][$i]['id']; ?>"
@@ -124,6 +130,12 @@ if (isset($_SESSION['url'])) {
             ?>
       </div>
       <div class="row justify-content-center">
+      <div style="display:none;" class="progress" id="progress">
+        <div class="progress-bar progress-bar-striped active" role="progressbar"
+          aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:100%">
+          It will take while.[:)]
+        </div>
+      </div>
         <div class="col-md-6">
           <input type="hidden" value="multiple" name="val"></input>
           <input type="button" value="Upload Selected Albums" class="btn btn-warning form-control"
@@ -132,12 +144,6 @@ if (isset($_SESSION['url'])) {
         <div class="col-md-6">
           <input type="button" value="Download Selected Albums" class="btn btn-warning form-control"
           onclick="download();" style="margin-bottom:10px;"></input>
-        </div>
-      </div>
-      <div style="display:none;" class="progress" id="progress">
-        <div class="progress-bar progress-bar-striped active" role="progressbar"
-          aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:100%">
-          It will take while.[:)]
         </div>
       </div>
     </form>
