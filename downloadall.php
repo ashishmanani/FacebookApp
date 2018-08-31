@@ -1,6 +1,5 @@
 <?php
 require_once "init.php";
-
 session_start();
 $totalalbum = count($_SESSION['userData']['albums']);
 if (isset($_REQUEST['val'])) {
@@ -17,7 +16,7 @@ if (isset($_REQUEST['val'])) {
                 } else {
                     unlink("images/".$_SESSION['userData']['id']."/".$_SESSION['userData']['albums'][$i]['name']."/photo$j.jpg");
                 }
-                file_put_contents("images/".$_SESSION['userData']['id']."/".$_SESSION['userData']['albums'][$i]['name']."/photo$j.jpg", file_get_contents($_SESSION['userData'][$albumid][$j]));
+                file_put_contents("images/".$_SESSION['userData']['id']."/".$_SESSION['userData']['albums'][$i]['name']."/photo$j.jpg", file_get_contents($_SESSION[$albumid][$j]));
             }
         }
     }
@@ -64,17 +63,17 @@ if (isset($_REQUEST['val'])) {
             $zip->close();
         }
     }
-
+	
     function downloadzip($filename)
     {
-        header("Content-type: application/zip"); 
+        header("Content-type: application/zip");
         header("Content-Disposition: attachment; filename=$filename");
         header("Content-length: " . filesize($filename));
-        header("Pragma: no-cache"); 
-        header("Expires: 0"); 
+        header("Pragma: no-cache");
+        header("Expires: 0");
         readfile("$filename");
     }
-
+    
     switch ($_REQUEST['val']) {
         case 'all':
             if (!file_exists("images/".$_SESSION['userData']['id'])) {
@@ -89,7 +88,6 @@ if (isset($_REQUEST['val'])) {
             }
             createzip("images/".$_SESSION['userData']['id'], "zip/".$_SESSION['userData']['id'].".zip");
             delete_files("images/".$_SESSION['userData']['id']);
-            downloadzip("zip/".$_SESSION['userData']['id'].".zip");
             break;
         case 'single':
             if($_REQUEST['q'] == ""){
@@ -113,7 +111,6 @@ if (isset($_REQUEST['val'])) {
             }
             createzip("images/".$_SESSION['userData']['id'], "zip/".$_SESSION['userData']['id'].".zip");
             delete_files("images/".$_SESSION['userData']['id']);
-            downloadzip("zip/".$_SESSION['userData']['id'].".zip");
             break;
         case 'multiple':
                 if($_REQUEST['q'] == ""){
