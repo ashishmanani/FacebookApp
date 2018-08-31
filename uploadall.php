@@ -1,7 +1,6 @@
 <?php
 require_once "lib/Google/config.php";
 require_once "init.php";
-
 if (isset($_REQUEST['val'])) {
     if (isset($_SESSION['gdaccess_token'])) {
         if($_REQUEST['val'] == 'single' || $_REQUEST['val'] == 'multiple')
@@ -45,6 +44,7 @@ if (isset($_REQUEST['val'])) {
         switch ($_REQUEST['val']) {
             case 'all':
                 $totalalbum = count($_SESSION['userData']['albums']);
+                //ini_set('max_execution_time', 300);
                 for ($i=0; $i<$totalalbum; $i++) {
                     $fileMetadata = new Google_Service_Drive_DriveFile(array(
                     'name' => $_SESSION['userData']['albums'][$i]['name'],
@@ -56,10 +56,11 @@ if (isset($_REQUEST['val'])) {
                     $folderId = $file->id;
                     uploadimage($i, $folderId, $service,$_SESSION['userData']['albums'][$i]['id']);
                 }
-                header('Location: index.php');
+		echo "<h3>Uploding Successfull.</h3>";
                 break;
             case 'single':
                 $totalalbum = count($_SESSION['userData']['albums']);
+                //ini_set('max_execution_time', 300);
                 for ($i=0; $i<$totalalbum; $i++) {
                     if ($_SESSION['userData']['albums'][$i]['id'] == $_REQUEST['q']) {
                         $fileMetadata = new Google_Service_Drive_DriveFile(array(
@@ -76,6 +77,7 @@ if (isset($_REQUEST['val'])) {
                 header('Location: index.php');
                 break;
             case 'multiple':
+                //ini_set('max_execution_time', 300);
                 foreach ($_REQUEST['q'] as $value) {
                     $totalalbum = count($_SESSION['userData']['albums']);
                     for ($i=0; $i<$totalalbum; $i++) {
@@ -100,7 +102,7 @@ if (isset($_REQUEST['val'])) {
         }
         exit();
     } else {
-        $_SESSION["url"] = "uploadall.php?".$_SERVER['QUERY_STRING'];
+        //$_SESSION["url"] = "uploadall.php?".$_SERVER['QUERY_STRING'];
         $loginURL = $Client->createAuthUrl();
         header('Location: '.$loginURL);
     }
