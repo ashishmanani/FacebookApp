@@ -1,4 +1,5 @@
 <?php
+require_once "init.php";
 session_start();
 if (!isset($_SESSION['fbaccess_token'])) {
     header('Location: fblogin.php');
@@ -51,8 +52,12 @@ if (isset($_SESSION['url'])) {
         <div class="collapse navbar-collapse" id="myNavbar">
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
-            <li><a href="uploadall.php?val=all">Upload All Albums To Drive</a></li>
-            <li><a href="downloadall.php?val=all">Download All Albums</a></li>
+			<?php if (isset($_SESSION['gdaccess_token'])) {?>
+            <li><a onclick="uploadimage('uploadall.php?val=all');">Upload All Albums To Drive</a></li>
+			<?php }else{?>
+			<li><a href="uploadall.php?val=login">Login To Drive</a></li>
+			<?php }?>
+			<li><a onclick="downloadpage('downloadall.php?val=all','');">Download All Albums</a></li>
             <li><a href="multiple.php">Multiple Selection Option</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
@@ -75,9 +80,10 @@ if (isset($_SESSION['url'])) {
         <h1 align="center" style="color:#0000FF;"><b>Your Albums</b></h1><br>
             <?php
             if (isset($_SESSION['userData']['albums'])) {
+				$user_id = $_SESSION['userData']['id'];
                 $totalalbum = count($_SESSION['userData']['albums']);
                 for ($i=0; $i<$totalalbum; $i++) {
-		    $albumid = $_SESSION['userData']['albums'][$i]['id'];
+					$albumid = $_SESSION['userData']['albums'][$i]['id'];
                     $count = $_SESSION['userData']['albums'][$i]['count'];?>
                     <div class="slider" id="<?php echo $_SESSION['userData']['albums'][$i]['id'];?>">
                       <div class="wrap" style="background:black;">
@@ -87,14 +93,14 @@ if (isset($_SESSION['url'])) {
 <div id="s<?php echo $_SESSION['userData']['albums'][$i]['id'];?>" class="slide">
                       <img src="<?php echo $_SESSION['userData'][$albumid][$j];?>"
                       width="50%"/>
-			<?php $tmp = $j+1; echo "<br>".$tmp;?>
+					  <?php $tmp = $j+1; echo "<br>".$tmp;?>
                     </div>
                         <?php
                     }
                     ?>
                   <div id="arrow-right<?php echo $_SESSION['userData']['albums'][$i]['id'];?>"
                     class="arrow-right"></div>
-                  <div id="close" class="close"
+                  <div id="close" class="closebtn"
                   onclick="closediv(<?php echo $_SESSION['userData']['albums'][$i]['id'];?>);"></div>
                 </div>
               </div>
@@ -117,9 +123,8 @@ if (isset($_SESSION['url'])) {
                 <a onclick="singleProgress(<?php echo $_SESSION['userData']['albums'][$i]['id'];?>);"
                   href="uploadall.php?val=single&q=<?php echo $_SESSION['userData']['albums'][$i]['id']; ?>"
                   class="btn btn-danger">Upload Album</a>
-                <a onclick="singleProgress(<?php echo $_SESSION['userData']['albums'][$i]['id'];?>);"
-                  href="downloadall.php?val=single&q=<?php echo $_SESSION['userData']['albums'][$i]['id']; ?>"
-                  class="btn btn-danger">Download Album</a>
+				<input type="button" value="Download Album" class="btn btn-danger"
+				onclick="downloadpage('downloadall.php?val=single&q=<?php echo $_SESSION['userData']['albums'][$i]['id']; ?>','<?php echo $_SESSION['userData']['albums'][$i]['id']; ?>');"/>
               </div>
                 <input type="checkbox" name="q[]" style="margin-top:10px;" value="<?php echo $_SESSION['userData']['albums'][$i]['id']?>">
                     For Upload/ Download.</input><br>
@@ -148,7 +153,95 @@ if (isset($_SESSION['url'])) {
       </div>
     </form>
     </div>
+  <!-- Modal -->
+  <div class="modal fade" id="downloadmodal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" id="modelclose" style="display:none;">&times;</button>
+        </div>
+        <div class="modal-body" align="center" id="modelbody">
+			<img src="images/loading.gif" id="loading"/>
+			<div style="display:none;" id="downloadbutton">
+				<h3>Click Download Button to Download Zip <?php echo $user_id;?>.zip.</h3><br>
+				<a href="zip/<?php echo $user_id;?>.zip" class="btn btn-success">Download</a>
+			</div>
+        </div>
+        <div class="modal-footer" id="modelclosebutton" style="display:none;">
+			<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
     </div>
+  </div>
+    <!-- Modal -->
+  <div class="modal fade" id="uploadmodal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" id="modelcloseupload" style="display:none;">&times;</button>
+        </div>
+        <div class="modal-body" align="center" id="modelbody">
+			<img src="images/loading.gif" id="loadingupload"/>
+			<div id="uploadtext">
+				
+			</div>
+        </div>
+        <div class="modal-footer" id="uploadmodelclosebutton" style="display:none;">
+			<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+    </div>
+	<script>
+		function downloadpage(url,id) {
+			$('#downloadmodal').modal({
+				backdrop: 'static',
+				keyboard: false
+			});
+			document.getElementById('modelclose').style.display = "none";
+			document.getElementById('downloadbutton').style.display = "none";
+			document.getElementById('modelclosebutton').style.display = "none";
+			document.getElementById('loading').style.display = "block";
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					document.getElementById('modelclose').style.display = "block";
+					document.getElementById('downloadbutton').style.display = "block";
+					document.getElementById('modelclosebutton').style.display = "block";
+					document.getElementById('loading').style.display = "none";
+				}
+			};
+			xhttp.open("GET", ""+url, true);
+			xhttp.send();
+		}
+		
+		function uploadimage(url) {
+			$('#uploadmodal').modal({
+				backdrop: 'static',
+				keyboard: false
+			});
+			document.getElementById('modelcloseupload').style.display = "none";
+			document.getElementById('loadingupload').style.display = "block";
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					document.getElementById('loadingupload').style.display = "none";
+					document.getElementById('uploadmodelclosebutton').style.display = "block";
+					document.getElementById('uploadtext').innerHTML = this.responseText;
+				}
+			};
+			xhttp.open("GET", ""+url, true);
+			xhttp.send();
+		}
+
+	</script>
     <script src="js/myjavascript.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
