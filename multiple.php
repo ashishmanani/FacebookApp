@@ -1,4 +1,9 @@
 <?php
+/*
+  Name:- Ashish P. Manani
+  Last Edit:- 07-09-2018
+  Purpose:- For Provide Uploading and Downloading Functionality of multiple albums.
+*/
 session_start();
 if (isset($_REQUEST['submit1'])) {
     session_destroy();
@@ -59,8 +64,8 @@ if (isset($_REQUEST['submit1'])) {
           <div class="container" style="margin-top: 100px">
               <div class="row justify-content-center">
                   <div class="col-md-6 col-md-offset-3" align="center">
-                  <form id="f1">
-                    <table><tr><td><?php
+                    <table>
+                        <tr><td><?php $user_id = $_SESSION['userData']['id'];
                             if(isset($_REQUEST['err']))
                             {
                              	echo "<font color='red'>* You have to select Atleast one checkbox</font>";
@@ -76,16 +81,66 @@ if (isset($_REQUEST['submit1'])) {
                     }
                     ?>
                     <tr>
-                  <td><br><input type="hidden" value="multiple" name="val"></input>
-                  <input type="button" value="Upload Albums" class="btn btn-danger" onclick="upload();"></input>
-                  <input type="button" value="Download Albums" class="btn btn-danger" onclick="download();"></input>
+                  <td><br>
+                  <?php if (isset($_SESSION['gdaccess_token'])) {?>
+                    <input type="button" value="Upload Selected Albums" class="btn btn-danger"
+                    onclick="uploadimage('uploadall.php?val=multiple&','multiple')"></input>
+                  <?php }else{?>
+                  <a href="uploadall.php?val=login" class="btn btn-danger">Login To Drive</a>
+                  <?php }?>
+                    <input type="button" value="Download Selected Albums" class="btn btn-danger"
+                    onclick="downloadpage('downloadall.php?val=multiple&','multiple')"></input>
                   </tr>
                 </table>
-                </form>
+                </div>
+              </div>
+              <!-- Modal -->
+              <div class="modal fade" id="downloadmodal" role="dialog">
+                <div class="modal-dialog">
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" id="modelclose" style="display:none;">&times;</button>
+                    </div>
+                    <div class="modal-body" align="center" id="modelbody">
+                  <img src="images/loading.gif" id="loading"/>
+                  <div style="display:none;" id="downloadbutton">
+                    <h3>Click Download Button to Download Zip <?php echo $user_id;?>.zip.</h3><br>
+                    <a href="zip/<?php echo $user_id;?>.zip" class="btn btn-success">Download</a>
+                  </div>
+                    </div>
+                    <div class="modal-footer" id="modelclosebutton" style="display:none;">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+                <!-- Modal -->
+              <div class="modal fade" id="uploadmodal" role="dialog">
+                <div class="modal-dialog">
+                
+                  <!-- Modal content-->
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal" id="modelcloseupload" style="display:none;">&times;</button>
+                    </div>
+                    <div class="modal-body" align="center" id="modelbody">
+                  <img src="images/loading.gif" id="loadingupload"/>
+                  <div id="uploadtext">
+                    
+                  </div>
+                    </div>
+                    <div class="modal-footer" id="uploadmodelclosebutton" style="display:none;">
+                  <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                  
                 </div>
               </div>
             </div>
-    <script src="js/myjavascript.js"></script>
+            
+    <script src="js/download_upload.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   </body>

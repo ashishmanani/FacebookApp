@@ -1,11 +1,15 @@
 <?php
+/*
+  Name:- Ashish P. Manani
+  Purpose:- it can used for authenticate facebook user i.e login functionality of facebook oauth.
+*/
 require_once "lib/Facebook/config.php";
 
 if (isset($_SESSION['fbaccess_token'])) {
     header('Location: index.php');
     exit();
 }
-
+//create login url of facebook.
 $redirectURL = "http://localhost/FacebookApp/fbcallback.php";
 $permissions = ['email','public_profile','user_photos'];
 $loginURL = $helper->getLoginUrl($redirectURL, $permissions);

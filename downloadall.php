@@ -1,9 +1,14 @@
 <?php
+/*
+  Name:- Ashish P. Manani
+  Last Edit:- 31-08-2018
+  Purpose:- For Provide Downloading Functionality this Script will be use.
+*/
 require_once "init.php";
 session_start();
 $totalalbum = count($_SESSION['userData']['albums']);
 if (isset($_REQUEST['val'])) {
-
+    //Put images on local machine
     function putimage($i,$albumid)
     {
         $count = $_SESSION['userData']['albums'][$i]['count'];
@@ -20,7 +25,7 @@ if (isset($_REQUEST['val'])) {
             }
         }
     }
-
+    //delete existing images and directories of perticular user.
     function delete_files($target)
     {
         if (is_dir($target)) {
@@ -36,7 +41,7 @@ if (isset($_REQUEST['val'])) {
             unlink($target);
         }
     }
-
+    //Create zip for downloaded images of perticular user.
     function createzip($originalpath, $zipfilepath)
     {
         if (file_exists($zipfilepath)) {
@@ -63,19 +68,10 @@ if (isset($_REQUEST['val'])) {
             $zip->close();
         }
     }
-	
-    function downloadzip($filename)
-    {
-        header("Content-type: application/zip");
-        header("Content-Disposition: attachment; filename=$filename");
-        header("Content-length: " . filesize($filename));
-        header("Pragma: no-cache");
-        header("Expires: 0");
-        readfile("$filename");
-    }
     
     switch ($_REQUEST['val']) {
         case 'all':
+        //for handaling download ALL Albums.
             if (!file_exists("images/".$_SESSION['userData']['id'])) {
                 mkdir("images/".$_SESSION['userData']['id']);
             }
@@ -90,6 +86,7 @@ if (isset($_REQUEST['val'])) {
             delete_files("images/".$_SESSION['userData']['id']);
             break;
         case 'single':
+        //For handaling Download Single selected album.
             if($_REQUEST['q'] == ""){
 				header('Location: multiple.php?err=d/u');
 			}
@@ -113,6 +110,7 @@ if (isset($_REQUEST['val'])) {
             delete_files("images/".$_SESSION['userData']['id']);
             break;
         case 'multiple':
+        //For handaling Download multiple selected albums.
                 if($_REQUEST['q'] == ""){
 		    header('Location: multiple.php?err=d/u');
 	        }

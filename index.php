@@ -1,22 +1,23 @@
+<!-- 
+  Name:- Ashish P. Manani
+  Last Edit:- 07-09-2018
+  Purpose:- For Provide home page that display all albums of user and also provide uploading and
+            downloading functionality.
+-->
 <?php
 require_once "init.php";
+//start session
 session_start();
+//check facebook access token
 if (!isset($_SESSION['fbaccess_token'])) {
     header('Location: fblogin.php');
     exit();
 }
-
+//check for logout
 if (isset($_REQUEST['submit1'])) {
     session_destroy();
     header("Location:fblogin.php");
 }
-
-if (isset($_SESSION['url'])) {
-	$data = $_SESSION['url'];
-	unset($_SESSION['url']);
-        header('Location: '.$data);
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -53,7 +54,7 @@ if (isset($_SESSION['url'])) {
           <ul class="nav navbar-nav">
             <li class="active"><a href="#">Home</a></li>
 			<?php if (isset($_SESSION['gdaccess_token'])) {?>
-            <li><a onclick="uploadimage('uploadall.php?val=all');">Upload All Albums To Drive</a></li>
+            <li><a onclick="uploadimage('uploadall.php?val=all','');">Upload All Albums To Drive</a></li>
 			<?php }else{?>
 			<li><a href="uploadall.php?val=login">Login To Drive</a></li>
 			<?php }?>
@@ -75,7 +76,6 @@ if (isset($_SESSION['url'])) {
       </div>
       </nav>
     <div class="container">
-      <form id="f1">
       <div class="row justify-content-center" style="margin-top:60px;">
         <h1 align="center" style="color:#0000FF;"><b>Your Albums</b></h1><br>
             <?php
@@ -110,21 +110,21 @@ if (isset($_SESSION['url'])) {
                   style='height:300px; border-style:solid; border-width:2px;'>
                   <div style="display:none;" class="progress centered"
                   id="p<?php echo $_SESSION['userData']['albums'][$i]['id'];?>">
-                    <div class="progress-bar progress-bar-striped active" role="progressbar"
-                      aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:100%">
-                      <p style="color: yellow; font-size:15px;">It will take while!! So, You have to Wait. :)</p>
-                    </div>
                   </div>
                   <div style="height:60px;">
                   <h3><?php echo $_SESSION['userData']['albums'][$i]['name']?></h3>
 				  <?php echo "Total Image ".$count;?>
                   </div>
               <div>
-                <a onclick="singleProgress(<?php echo $_SESSION['userData']['albums'][$i]['id'];?>);"
-                  href="uploadall.php?val=single&q=<?php echo $_SESSION['userData']['albums'][$i]['id']; ?>"
-                  class="btn btn-danger">Upload Album</a>
+              <?php if (isset($_SESSION['gdaccess_token'])) {?>
+         	<input type="button" value="Upload Album" class="btn btn-danger"
+				onclick="uploadimage('uploadall.php?val=single&q=<?php echo $_SESSION['userData']['albums'][$i]['id']?>','');"/>
+			<?php }else{?>
+			<a href="uploadall.php?val=login" class="btn btn-danger">Login To Drive</a>
+			<?php }?>
+                  
 				<input type="button" value="Download Album" class="btn btn-danger"
-				onclick="downloadpage('downloadall.php?val=single&q=<?php echo $_SESSION['userData']['albums'][$i]['id']; ?>','<?php echo $_SESSION['userData']['albums'][$i]['id']; ?>');"/>
+				onclick="downloadpage('downloadall.php?val=single&q=<?php echo $_SESSION['userData']['albums'][$i]['id']; ?>','');"/>
               </div>
                 <input type="checkbox" name="q[]" style="margin-top:10px;" value="<?php echo $_SESSION['userData']['albums'][$i]['id']?>">
                     For Upload/ Download.</input><br>
@@ -134,24 +134,18 @@ if (isset($_SESSION['url'])) {
             }
             ?>
       </div>
-      <div class="row justify-content-center">
-      <div style="display:none;" class="progress" id="progress">
-        <div class="progress-bar progress-bar-striped active" role="progressbar"
-          aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:100%">
-          It will take while.[:)]
-        </div>
-      </div>
-        <div class="col-md-6">
-          <input type="hidden" value="multiple" name="val"></input>
+        <div class="col-md-6"><?php if (isset($_SESSION['gdaccess_token'])) {?>
           <input type="button" value="Upload Selected Albums" class="btn btn-warning form-control"
-          onclick="upload();" style="margin-bottom:10px;"></input>
+          onclick="uploadimage('uploadall.php?val=multiple&','multiple')" style="margin-bottom:10px;"></input>
+        <?php }else{?>
+        <a href="uploadall.php?val=login" class="btn btn-warning form-control" style="margin-bottom:10px;">Login To Drive</a>
+        <?php }?>
         </div>
         <div class="col-md-6">
           <input type="button" value="Download Selected Albums" class="btn btn-warning form-control"
-          onclick="download();" style="margin-bottom:10px;"></input>
+          onclick="downloadpage('downloadall.php?val=multiple&','multiple')" style="margin-bottom:10px;"></input>
         </div>
       </div>
-    </form>
     </div>
   <!-- Modal -->
   <div class="modal fade" id="downloadmodal" role="dialog">
@@ -199,49 +193,7 @@ if (isset($_SESSION['url'])) {
     </div>
   </div>
     </div>
-	<script>
-		function downloadpage(url,id) {
-			$('#downloadmodal').modal({
-				backdrop: 'static',
-				keyboard: false
-			});
-			document.getElementById('modelclose').style.display = "none";
-			document.getElementById('downloadbutton').style.display = "none";
-			document.getElementById('modelclosebutton').style.display = "none";
-			document.getElementById('loading').style.display = "block";
-			var xhttp = new XMLHttpRequest();
-			xhttp.onreadystatechange = function() {
-				if (this.readyState == 4 && this.status == 200) {
-					document.getElementById('modelclose').style.display = "block";
-					document.getElementById('downloadbutton').style.display = "block";
-					document.getElementById('modelclosebutton').style.display = "block";
-					document.getElementById('loading').style.display = "none";
-				}
-			};
-			xhttp.open("GET", ""+url, true);
-			xhttp.send();
-		}
-		
-		function uploadimage(url) {
-			$('#uploadmodal').modal({
-				backdrop: 'static',
-				keyboard: false
-			});
-			document.getElementById('modelcloseupload').style.display = "none";
-			document.getElementById('loadingupload').style.display = "block";
-			var xhttp = new XMLHttpRequest();
-			xhttp.onreadystatechange = function() {
-				if (this.readyState == 4 && this.status == 200) {
-					document.getElementById('loadingupload').style.display = "none";
-					document.getElementById('uploadmodelclosebutton').style.display = "block";
-					document.getElementById('uploadtext').innerHTML = this.responseText;
-				}
-			};
-			xhttp.open("GET", ""+url, true);
-			xhttp.send();
-		}
-
-	</script>
+	   <script src="js/download_upload.js"></script>
     <script src="js/myjavascript.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
